@@ -7,6 +7,7 @@ output: html_document
 install.packages("tidyverse")
 install.packages("tidyquant")
 install.packages("ggplot2")
+install.packages("dplyr")
 
 ```
 
@@ -14,6 +15,7 @@ install.packages("ggplot2")
 library(tidyverse)
 library(tidyquant)
 library(ggplot2)
+library(dplyr)
 ```
 
 
@@ -24,11 +26,97 @@ View(cdproject_stock)
 ```
 
 ```{r}
-dataset <- sort(cdproject_stock$Data, decreasing = FALSE)
+#Created new chronologic dataset
+newdata <- cdproject_stock[order(cdproject_stock$Data),]
+newdata
 
-install.packages("dplyr")
+```
+
+```{r}
+
+newdata$Data <- as.Date(newdata$Data)
+newdata$Otwarcie <- as.numeric(newdata$Otwarcie)
+newdata$Max <- as.numeric(newdata$Max)
+newdata$Min <- as.numeric(newdata$Min)
+newdata$Zamknięcie <- as.numeric(newdata$Zamknięcie)
+
+str(newdata)
+
+```
+
+```{r}
+#Line chart
+newdata %>%
+  ggplot(aes(x=Data, y=Zamknięcie)) +
+  geom_line(colour = "black") +
+  labs(title="Ceny zamkniecia dla CD Projekt", y="Ceny zamnięcia", x="") +
+  theme_bw()  
+
+```
+```{r}
+#Bar chart
+newdata %>%
+  ggplot(aes(x=Data, y= Zamknięcie)) +
+  geom_barchart(aes(open= Otwarcie, high= Max, low= Min, close= Zamknięcie)) +
+  labs(title= "Barchart dla cen akcji CD Projekt", y="Ceny zamknięcia", x="") +
+  theme_bw()
+
+```
+```{r}
+#Zoomin graphs 
+newdata %>%
+  ggplot(aes(x=Data, y=Zamknięcie)) +
+  geom_barchart(aes(open= Otwarcie, high= Max, low=Min, close= Zamknięcie)) +
+  labs(title="Barchart dla cen akcji CD Projekt",
+       subtitle="Zbliżenie na poszczególne dni",
+       y="ceny zamknięcia",
+       x="") +
+  coord_x_date(xlim=c("2019-05-06", "2019-06-03"),
+               ylim=c(200, 230)) +
+  theme_bw()
 
 
+```
 
+```{r}
+#Candlestick charts 
+
+newdata %>%
+  ggplot(aes(x=Data, y=Zamknięcie)) +
+  geom_candlestick(aes(open= Otwarcie, high= Max, low=Min, close= Zamknięcie)) +
+  labs(title="Wykres świeczkowy dla cen akcji CD Projekt",
+       y="Ceny zamknięcia",
+       x="") +
+  theme_bw()
+
+
+```
+```{r}
+#Learning how to zoomin with end, days and weeks
+
+newdata %>%
+  ggplot(aes(x=Data, y=Zamknięcie)) +
+  geom_candlestick(aes(open= Otwarcie, high= Max, low=Min, close= Zamknięcie)) +
+  labs(title="Wykres świeczkowy dla cen akcji CD Projekt",
+       y="Ceny zamknięcia",
+       x="") +
+  coord_x_date(xlim=c(today() - weeks(4), today()),
+               ylim = c(234,270)) +
+  theme_bw()
+```
+```{r}
+#Visualising trends with Simple Moving Averages(średnia krocząca)
+
+newdata %>%
+  ggplot(aes(x=Data, y=Zamknięcie)) +
+  geom_line() +
+  geom_ma(ma_fun = SMA, n= 25, linetype= 5, size= 1.3) +
+  labs(title = "Wykres liniowy dla cen akcji CD Projekt",
+       y="Ceny zamknięcia",
+       x="",
+       subtitle = "Średnie kroczące dla 25 dni") 
+
+
+  
 ```
 
