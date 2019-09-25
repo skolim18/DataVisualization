@@ -1,0 +1,34 @@
+---
+title: "training"
+output: html_document
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("tidyquant")
+install.packages("ggplot2")
+
+```
+
+```{r}
+library(tidyverse)
+library(tidyquant)
+library(ggplot2)
+```
+
+
+```{r}
+library(readxl)
+cdproject_stock <- read_excel("cdproject_stock.xlsx")
+View(cdproject_stock)
+```
+
+```{r}
+dataset <- sort(cdproject_stock$Data, decreasing = FALSE)
+
+install.packages("dplyr")
+
+
+
+```
+
